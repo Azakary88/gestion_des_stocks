@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Utilisateurs</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">Gestion des utilisateurs</div>
+  <button onclick="location.href='/user-form.html'">Nouvel utilisateur</button>
+</header>
+
+<main class="container">
+  <h1>Liste des utilisateurs</h1>
+
+  <table id="table"></table>
+</main>
+
+<script src="/app.js"></script>
+<script>
+  if (!appGetToken()) location.href="/login.html";
+
+  async function load() {
+    const users = await appFetch("/api/users");
+
+    document.getElementById("table").innerHTML = `
+      <tr><th>ID</th><th>Email</th><th>Rôle</th><th>Actions</th></tr>
+      ${users.map(u => `
+        <tr>
+          <td>${u.id}</td>
+          <td>${u.email}</td>
+          <td>${u.role}</td>
+          <td>
+            <button onclick="edit(${u.id})">Modifier</button>
+            <button onclick="del(${u.id})">Supprimer</button>
+          </td>
+        </tr>
+      `).join("")}
+    `;
+  }
+
+  function edit(id) {
+    location.href = "/user-form.html?id=" + id;
+  }
+
+  async function del(id) {
+    if (!confirm("Supprimer cet utilisateur ?")) return;
+    await appFetch(`/api/users/${id}`, { method: "DELETE" });
+    load();
+  }
+
+  load();
+</script>
+
+</body>
+</html>

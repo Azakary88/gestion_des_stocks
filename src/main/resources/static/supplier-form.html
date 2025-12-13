@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Fournisseur</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">Inventory</div>
+  <div><button onclick="location.href='/suppliers.html'">Retour</button></div>
+  <button onclick="location.href='/dashboard.html'">
+    ⬅ Tableau de bord
+  </button>
+</header>
+
+<main class="container">
+  <h1 id="title">Créer un fournisseur</h1>
+
+  <form id="form">
+    <label>Nom<br/><input id="name" required /></label>
+
+    <div class="actions">
+      <button type="submit">Enregistrer</button>
+      <button type="button" onclick="location.href='/suppliers.html'">Annuler</button>
+    </div>
+  </form>
+</main>
+
+<script src="/app.js"></script>
+<script>
+  if(!appGetToken()) location.href = "/login.html";
+
+  const params = new URLSearchParams(location.search);
+  const id = params.get("id");
+
+  async function load() {
+    if (!id) return;
+    const s = await appFetch(`/api/suppliers/${id}`);
+    document.getElementById("name").value = s.name;
+    document.getElementById("title").textContent = "Modifier fournisseur";
+  }
+
+  document.getElementById("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const payload = {
+      name: document.getElementById("name").value
+    };
+
+    if (id) {
+      await appFetch(`/api/suppliers/${id}`, { method: "PUT", body: JSON.stringify(payload) });
+    } else {
+      await appFetch(`/api/suppliers`, { method: "POST", body: JSON.stringify(payload) });
+    }
+
+    location.href = "/suppliers.html";
+  });
+
+  load();
+</script>
+
+</body>
+</html>

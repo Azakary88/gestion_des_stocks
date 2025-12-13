@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://db:5432/inventory_db
+    username: inventory_user
+    password: inventory_pass
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+server:
+  port: 8080
+
+security:
+  jwt:
+    secret: change-me-to-a-very-long-secret-key
+    expiration-ms: 3600000

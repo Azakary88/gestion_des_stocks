@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Mouvements de stock</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">Inventory</div>
+  <div><button onclick="location.href='/movement-form.html'">Nouveau mouvement</button></div>
+  <button onclick="location.href='/dashboard.html'">
+    ⬅ Tableau de bord
+  </button>
+</header>
+
+<main class="container">
+  <h1>Mouvements de stock</h1>
+  <table id="table"></table>
+</main>
+
+<script src="/app.js"></script>
+<script>
+  if (!appGetToken()) location.href = '/login.html';
+
+  async function load() {
+    const list = await appFetch('/api/movements');
+    const table = document.getElementById('table');
+    table.innerHTML = `
+      <tr><th>ID</th><th>Produit</th><th>Type</th><th>Quantité</th><th>Date</th></tr>
+      ${list.map(m => `
+        <tr>
+          <td>${m.id}</td>
+          <td>${m.product.name}</td>
+          <td>${m.type}</td>
+          <td>${m.quantity}</td>
+          <td>${m.createdAt}</td>
+        </tr>
+      `).join('')}
+    `;
+  }
+
+  load();
+</script>
+</body>
+</html>

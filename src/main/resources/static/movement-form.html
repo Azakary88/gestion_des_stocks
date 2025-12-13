@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Nouveau mouvement</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">Inventory</div>
+  <div><button onclick="location.href='/movements.html'">Retour</button></div>
+  <button onclick="location.href='/dashboard.html'">
+    ⬅ Tableau de bord
+  </button>
+</header>
+
+<main class="container">
+  <h1>Nouveau Mouvement</h1>
+
+  <form id="form">
+    <label>Produit
+      <select id="product"></select>
+    </label>
+
+    <label>Type
+      <select id="type">
+        <option value="IN">Entrée</option>
+        <option value="OUT">Sortie</option>
+      </select>
+    </label>
+
+    <label>Quantité
+      <input type="number" id="quantity" value="1">
+    </label>
+
+    <label>Note
+      <input id="note">
+    </label>
+
+    <button type="submit">Valider</button>
+  </form>
+</main>
+
+<script src="/app.js"></script>
+<script>
+  if (!appGetToken()) location.href = '/login.html';
+
+  async function loadProducts() {
+    const products = await appFetch('/api/products');
+    const sel = document.getElementById('product');
+    sel.innerHTML = products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+  }
+
+  document.getElementById('form').addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const movement = {
+      product: { id: parseInt(document.getElementById('product').value) },
+      quantity: parseInt(document.getElementById('quantity').value),
+      type: document.getElementById('type').value,
+      note: document.getElementById('note').value
+    };
+
+    await appFetch('/api/movements', { method: 'POST', body: JSON.stringify(movement) });
+    location.href = '/movements.html';
+  });
+
+  loadProducts();
+</script>
+
+</body>
+</html>

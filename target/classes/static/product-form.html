@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Formulaire Produit - Inventory</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Inventory</div>
+    <div><button onclick="location.href='/products.html'">Retour</button></div>
+  </header>
+
+  <main class="container">
+    <h1 id="formTitle">Ajouter un produit</h1>
+    <form id="productForm">
+      <label>SKU<br/><input id="sku" type="text" required /></label>
+      <label>Nom<br/><input id="name" required /></label>
+      <label>Description<br/><input id="description" /></label>
+      <label>Quantité<br/><input id="stockQuantity" type="number" value="0" /></label>
+      <div class="actions">
+        <button type="submit">Enregistrer</button>
+        <button type="button" onclick="location.href='/products.html'">Annuler</button>
+      </div>
+    </form>
+  </main>
+
+  <script src="/app.js"></script>
+  <script>
+    if (!appGetToken()) location.href = '/login.html';
+
+    const params = new URLSearchParams(location.search);
+    const id = params.get('id');
+
+    async function loadProduct(id) {
+      const p = await appFetch(`/api/products/${id}`);
+      if (!p) return;
+      document.getElementById('sku').value = p.sku || '';
+      document.getElementById('name').value = p.name || '';
+      document.getElementById('description').value = p.description || '';
+      document.getElementById('stockQuantity').value = p.stockQuantity ?? p.quantity ?? 0;
+      document.getElementById('formTitle').textContent = 'Modifier le produit';
+    }
+
+    document.getElementById('productForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        sku: document.getElementById('sku').value,
+        name: document.getElementById('name').value,
+        description: document.getElementById('description').value,
+        stockQuantity: parseInt(document.getElementById('stockQuantity').value || '0', 10)
+      };
+      try {
+        if (id) {
+          await appFetch(`/api/products/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
+        } else {
+          await appFetch('/api/products', { method: 'POST', body: JSON.stringify(payload) });
+        }
+        location.href = '/products.html';
+      } catch (err) {
+        console.error(err);
+        alert('Erreur lors de l\'enregistrement');
+      }
+    });
+
+    if (id) loadProduct(id);
+  </script>
+</body>
+</html>

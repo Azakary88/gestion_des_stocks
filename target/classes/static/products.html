@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Produits - Inventory</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Inventory</div>
+    <div>
+      <button id="btnAdd">Ajouter</button>
+      <button id="btnLogout">Déconnexion</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1>Produits</h1>
+    <table id="productsTable">
+      <thead>
+        <tr><th>ID</th><th>SKU</th><th>Nom</th><th>Quantité</th><th>Actions</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div id="message" class="info" style="display:none"></div>
+  </main>
+
+  <script src="/app.js"></script>
+  <script>
+    if (!appGetToken()) location.href = '/login.html';
+
+    async function load() {
+      try {
+        const data = await appFetch('/api/products');
+        const tbody = document.querySelector('#productsTable tbody');
+        tbody.innerHTML = '';
+        if (!data || data.length === 0) {
+          document.getElementById('message').style.display = 'block';
+          document.getElementById('message').textContent = 'Aucun produit';
+          return;
+        }
+        data.forEach(p => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${p.id||''}</td><td>${p.sku||'-'}</td><td>${p.name||''}</td><td>${p.stockQuantity ?? p.quantity ?? 0}</td>
+            <td>
+              <button data-id="${p.id}" class="btn-edit">Éditer</button>
+              <button data-id="${p.id}" class="btn-del">Suppr</button>
+            </td>`;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error(err);
+        alert('Erreur lors du chargement des produits');
+      }
+    }
+
+    document.getElementById('btnAdd').addEventListener('click', () => location.href = '/product-form.html');
+    document.getElementById('btnLogout').addEventListener('click', () => { appLogout(); location.href = '/login.html'; });
+
+    document.querySelector('#productsTable tbody').addEventListener('click', async (e) => {
+      if (e.target.matches('.btn-del')) {
+        const id = e.target.dataset.id;
+        if (!confirm('Supprimer ce produit ?')) return;
+        await appFetch(`/api/products/${id}`, { method: 'DELETE' });
+        await load();
+      } else if (e.target.matches('.btn-edit')) {
+        const id = e.target.dataset.id;
+        location.href = `/product-form.html?id=${id}`;
+      }
+    });
+
+    load();
+  </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Catégorie</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">Inventory</div>
+  <button onclick="location.href='/categories.html'">Retour</button>
+</header>
+
+<main class="container">
+  <h1 id="title">Nouvelle Catégorie</h1>
+
+  <form id="form">
+    <label>Nom<br/><input id="name" required/></label>
+
+    <button type="submit">Enregistrer</button>
+  </form>
+</main>
+
+<script src="/app.js"></script>
+<script>
+  if (!appGetToken()) location.href='/login.html';
+
+  const params = new URLSearchParams(location.search);
+  const id = params.get('id');
+
+  async function load() {
+    if (!id) return;
+    const c = await appFetch(`/api/categories/${id}`);
+    document.getElementById('name').value = c.name;
+    document.getElementById('title').textContent = "Modifier Catégorie";
+  }
+
+  document.getElementById('form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const payload = { name: document.getElementById('name').value };
+    if (id) 
+        await appFetch(`/api/categories/${id}`, { method: "PUT", body: JSON.stringify(payload) });
+    else 
+        await appFetch(`/api/categories`, { method: "POST", body: JSON.stringify(payload) });
+
+    location.href = "/categories.html";
+  });
+
+  load();
+</script>
+</body>
+</html>

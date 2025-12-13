@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Catégories</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">Inventory</div>
+  <div><button onclick="location.href='/category-form.html'">Nouvelle Catégorie</button></div>
+</header>
+
+<main class="container">
+  <h1>Catégories</h1>
+  <table id="table"></table>
+</main>
+
+<script src="/app.js"></script>
+<script>
+  if (!appGetToken()) location.href = '/login.html';
+
+  async function load() {
+    const data = await appFetch('/api/categories');
+    const table = document.getElementById('table');
+    table.innerHTML = `
+      <tr><th>ID</th><th>Nom</th><th>Actions</th></tr>
+      ${data.map(c => `
+        <tr>
+          <td>${c.id}</td>
+          <td>${c.name}</td>
+          <td>
+            <button onclick="edit(${c.id})">Modifier</button>
+            <button onclick="del(${c.id})">Supprimer</button>
+          </td>
+        </tr>
+      `).join('')}
+    `;
+  }
+
+  function edit(id) {
+    location.href = "/category-form.html?id=" + id;
+  }
+
+  async function del(id) {
+    if (confirm("Supprimer ?")) {
+      await appFetch(`/api/categories/${id}`, { method: "DELETE" });
+      load();
+    }
+  }
+
+  load();
+</script>
+</body>
+</html>

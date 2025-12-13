@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Fournisseurs</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">Inventory</div>
+  <div><button onclick="location.href='/supplier-form.html'">Nouveau Fournisseur</button></div>
+  <button onclick="location.href='/dashboard.html'">
+    ⬅ Tableau de bord
+  </button>
+</header>
+
+<main class="container">
+  <h1>Fournisseurs</h1>
+
+  <table id="table"></table>
+</main>
+
+<script src="/app.js"></script>
+<script>
+  if (!appGetToken()) location.href = '/login.html';
+
+  async function load() {
+    const data = await appFetch('/api/suppliers');
+    const table = document.getElementById('table');
+    table.innerHTML = `
+      <tr><th>ID</th><th>Nom</th><th>Actions</th></tr>
+      ${data.map(s => `
+        <tr>
+          <td>${s.id}</td>
+          <td>${s.name}</td>
+          <td>
+            <button onclick="edit(${s.id})">Modifier</button>
+            <button onclick="del(${s.id})">Supprimer</button>
+          </td>
+        </tr>
+      `).join('')}
+    `;
+  }
+
+  function edit(id) {
+    location.href = "/supplier-form.html?id=" + id;
+  }
+
+  async function del(id) {
+    if (confirm("Supprimer ?")) {
+      await appFetch(`/api/suppliers/${id}`, { method: "DELETE" });
+      load();
+    }
+  }
+
+  load();
+</script>
+
+</body>
+</html>

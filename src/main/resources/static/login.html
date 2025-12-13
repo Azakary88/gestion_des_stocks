@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Connexion - Inventory</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>Connexion</h1>
+    <form id="loginForm">
+      <label>Email<br/><input type="email" id="email" value="admin@azakary.com" required /></label>
+      <label>Mot de passe<br/><input type="password" id="password" value="admin123" required /></label>
+      <button type="submit">Se connecter</button>
+      <div id="error" class="error" style="display:none"></div>
+    </form>
+  </main>
+
+  <script src="/app.js"></script>
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      try {
+        await appLogin(email, password);
+        location.href = '/dashboard.html';
+      } catch (err) {
+        const el = document.getElementById('error');
+        el.style.display = 'block';
+        el.textContent = err.message || 'Échec de la connexion';
+      }
+    });
+  </script>
+</body>
+</html>

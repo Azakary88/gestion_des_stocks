@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Utilisateur</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">Utilisateur</div>
+  <button onclick="location.href='/users.html'">Retour</button>
+</header>
+
+<main class="container">
+  <h1 id="title">Créer un utilisateur</h1>
+
+  <form id="form">
+    <label>Email<br><input id="email" required></label>
+    <label>Mot de passe<br><input id="password" type="password"></label>
+
+    <label>Rôle<br>
+      <select id="role">
+        <option value="ADMIN">ADMIN</option>
+        <option value="EMPLOYEE">EMPLOYEE</option>
+      </select>
+    </label>
+
+    <button type="submit">Enregistrer</button>
+  </form>
+
+</main>
+
+<script src="/app.js"></script>
+<script>
+  if (!appGetToken()) location.href="/login.html";
+
+  const params = new URLSearchParams(location.search);
+  const id = params.get("id");
+
+  async function load() {
+    if (!id) return;
+    document.getElementById("title").textContent = "Modifier un utilisateur";
+
+    const u = await appFetch(`/api/users/${id}`);
+
+    document.getElementById("email").value = u.email;
+    document.getElementById("role").value = u.role;
+  }
+
+  document.getElementById("form").addEventListener("submit", async e => {
+    e.preventDefault();
+
+    const payload = {
+      email: email.value,
+      role: role.value,
+      password: password.value || null
+    };
+
+    if (id) {
+      await appFetch(`/api/users/${id}`, { method:"PUT", body: JSON.stringify(payload) });
+    } else {
+      await appFetch(`/api/users`, { method:"POST", body: JSON.stringify(payload) });
+    }
+
+    location.href = "/users.html";
+  });
+
+  load();
+</script>
+
+</body>
+</html>
