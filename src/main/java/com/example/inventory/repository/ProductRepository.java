@@ -11,4 +11,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("SELECT SUM(p.stockQuantity * p.price) FROM Product p")
         Double totalStockValue();
+    
+     @Query("SELECT COALESCE(SUM(p.stockQuantity), 0) FROM Product p")
+    Long totalStockQuantity();
 }

@@ -4,16 +4,11 @@ WORKDIR /app
 
 # Copier pom.xml uniquement
 COPY pom.xml .
-
-# Télécharger les dépendances AVANT de copier le code
-RUN mvn -B -DskipTests install
-
+RUN mvn -B -U -e -DskipTests dependency:resolve
 
 # Copier le code source
 COPY src ./src
-
-# Build normal 
-RUN mvn -B -DskipTests package
+RUN mvn -B -U -DskipTests package
 
 # Image finale
 FROM eclipse-temurin:17-jdk

@@ -23,7 +23,7 @@ public class DashboardController {
 
         int totalStock = products.stream().mapToInt(Product::getStockQuantity).sum();
         double totalValue = products.stream()
-                .mapToDouble(p -> p.getStockQuantity() * 1.0) // valeur unitaire non définie
+                .mapToDouble(p -> p.getStockQuantity() * 1.0) 
                 .sum();
 
         List<Product> top5 = products.stream()

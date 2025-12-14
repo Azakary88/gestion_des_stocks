@@ -32,16 +32,16 @@
 
   <h1>Tableau de bord</h1>
 
-  <div class="row">
-    <div class="card">
-      <h2>Stock total</h2>
-      <div id="totalStock">0</div>
-    </div>
+  <div class="card highlight">
+    <h2>Stock total</h2>
+    <div class="big" id="totalStock">0</div>
+    <small>Unités en stock</small>
+  </div>
 
-    <div class="card">
-      <h2>Valeur totale du stock</h2>
-      <div id="totalValue">0</div>
-    </div>
+  <div class="card highlight success">
+    <h2>Valeur totale du stock</h2>
+    <div class="big" id="totalValue">0</div>
+    <small>Valeur financière</small>
   </div>
 
   <div class="row">
@@ -77,7 +77,11 @@
     const data = await appFetch("/api/dashboard");
 
     document.getElementById("totalStock").textContent = data.totalStock;
-    document.getElementById("totalValue").textContent = data.totalValue;
+    document.getElementById("totalValue").textContent =
+      new Intl.NumberFormat("fr-FR", {
+        style: "currency",
+        currency: "XOF"
+      }).format(data.totalValue);
 
     document.getElementById("top5").innerHTML = `
       <tr><th>Nom</th><th>Stock</th></tr>
